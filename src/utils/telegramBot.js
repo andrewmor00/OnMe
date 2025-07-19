@@ -295,41 +295,6 @@ class TelegramBotService {
       console.log('⚠️ No Telegram username provided - showing code in alert');
       alert(`🔐 Verification Code: ${code}\n\nNo Telegram username provided.\n\nPlease use this code: ${code}`);
       return { success: true, message: 'Code generated (no username)' };
-      
-      console.log(`📱 Sending message to chat ID: ${chatId}`);
-      
-      try {
-        console.log(`📱 Sending message to chat ID: ${chatId}`);
-        console.log(`📱 Message: ${message}`);
-        
-        const response = await fetch(`${this.apiBase}${this.botToken}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text: message,
-            parse_mode: 'HTML'
-          })
-        });
-        
-        const result = await response.json();
-        console.log('Telegram API response:', result);
-        
-        if (result.ok) {
-          console.log('✅ Message sent successfully to Telegram!');
-          return { success: true, message: 'Code sent successfully to Telegram!' };
-        } else {
-          console.log('❌ Failed to send message:', result.description);
-          // Fallback to showing code in alert if sending fails
-          alert(`🔐 Verification Code: ${code}\n\nFailed to send to Telegram: ${result.description}\n\nPlease use this code: ${code}`);
-          return { success: true, message: `Code generated (Telegram failed: ${result.description})` };
-        }
-      } catch (sendError) {
-        console.error('Error sending to Telegram:', sendError);
-        // Fallback to showing code in alert
-        alert(`🔐 Verification Code: ${code}\n\nError sending to Telegram: ${sendError.message}\n\nPlease use this code: ${code}`);
-        return { success: true, message: 'Code generated (Telegram error)' };
-      }
     } catch (error) {
       console.error('Error sending verification code:', error);
       return { success: false, error: 'Failed to send verification code' };
