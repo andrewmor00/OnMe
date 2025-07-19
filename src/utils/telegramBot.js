@@ -27,8 +27,6 @@ class TelegramBotService {
       // Initialize automatic chat ID detection only if configured
   if (this.isConfigured) {
     this.initializeChatIdDetection();
-    // Also start polling for new messages to detect when users start conversations
-    this.startMessagePolling();
   }
   }
 
@@ -244,17 +242,7 @@ class TelegramBotService {
       if (telegramUsername) {
         console.log(`📱 Attempting to send to Telegram username: @${telegramUsername}`);
         
-        // First, try to get user info to see if we can find their chat ID
-        try {
-          const userResponse = await fetch(`${this.apiBase}${this.botToken}/getChat?chat_id=@${telegramUsername}`);
-          const userData = await userResponse.json();
-          
-          if (userData.ok) {
-            console.log('✅ User found, attempting to send message...');
-          }
-        } catch (error) {
-          console.log('⚠️ Could not get user info, trying direct message...');
-        }
+
         
         try {
           const response = await fetch(`${this.apiBase}${this.botToken}/sendMessage`, {
@@ -433,67 +421,7 @@ class TelegramBotService {
     }
   }
 
-  // Start polling for new messages to detect when users start conversations
-  startMessagePolling() {
-    if (!this.isConfigured) return;
-    
-    // Poll every 30 seconds for new messages
-    setInterval(async () => {
-      try {
-        const response = await fetch(`${this.apiBase}${this.botToken}/getUpdates?timeout=10`);
-        const data = await response.json();
-        
-        if (data.ok && data.result.length > 0) {
-          data.result.forEach(update => {
-            if (update.message && update.message.text === '/start') {
-              const chatId = update.message.chat.id;
-              const username = update.message.chat.username || update.message.chat.first_name;
-              console.log(`✅ New user started bot: ${username} (${chatId})`);
-              
-              // Store the chat ID for future use
-              const chatIds = this.getStoredChatIds();
-              chatIds[chatId] = {
-                username: username,
-                firstName: update.message.chat.first_name || '',
-                lastName: update.message.chat.last_name || '',
-                lastMessage: '/start',
-                timestamp: Date.now()
-              };
-              this.storeChatIds(chatIds);
-              
-              // Send welcome message
-              this.sendWelcomeMessage(chatId, username);
-            }
-          });
-        }
-      } catch (error) {
-        console.log('❌ Message polling error:', error.message);
-      }
-    }, 30000);
-  }
 
-  // Send welcome message to new users
-  async sendWelcomeMessage(chatId, username) {
-    try {
-      const message = `👋 Welcome to OnMyFeed, ${username}!\n\nI'm here to help you verify your account. When you link your account on our website, I'll send you verification codes.\n\nYou're all set! 🎉`;
-      
-      await fetch(`${this.apiBase}${this.botToken}/sendMessage`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: message,
-          parse_mode: 'HTML'
-        })
-      });
-      
-      console.log(`✅ Welcome message sent to ${username}`);
-    } catch (error) {
-      console.log('❌ Error sending welcome message:', error);
-    }
-  }
 
   // Clean up expired verifications
   cleanupExpiredVerifications() {
