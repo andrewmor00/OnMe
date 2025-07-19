@@ -120,6 +120,35 @@ class TelegramBotService {
     return chatIds;
   }
 
+  // Link user's Telegram account
+  async linkUserTelegram(userId, phoneNumber) {
+    try {
+      console.log(`🔗 Linking Telegram for user ${userId} with phone ${phoneNumber}`);
+      
+      // Generate a temporary code for linking
+      const linkCode = this.generateVerificationCode();
+      
+      // Store the linking request
+      this.storePendingVerification(phoneNumber, linkCode, userId);
+      
+      // Send the linking code
+      const result = await this.sendVerificationCode(phoneNumber, linkCode, userId);
+      
+      if (result.success) {
+        return { 
+          success: true, 
+          message: 'Link code sent to your Telegram. Please check your messages and enter the code to complete linking.',
+          code: linkCode // For testing purposes
+        };
+      } else {
+        return { success: false, error: result.error };
+      }
+    } catch (error) {
+      console.error('Error linking Telegram:', error);
+      return { success: false, error: 'Failed to link Telegram account' };
+    }
+  }
+
   // Generate a random verification code
   generateVerificationCode() {
     return Math.floor(100000 + Math.random() * 900000).toString();
@@ -135,6 +164,26 @@ class TelegramBotService {
       attempts: 0
     };
     localStorage.setItem(this.storageKey, JSON.stringify(verifications));
+  }
+
+  // Store user's chat ID
+  storeUserChatId(userId, chatId, userInfo) {
+    const chatIds = this.getStoredChatIds();
+    chatIds[userId] = {
+      chatId,
+      username: userInfo.username || 'Unknown',
+      firstName: userInfo.firstName || '',
+      lastName: userInfo.lastName || '',
+      timestamp: Date.now()
+    };
+    this.storeChatIds(chatIds);
+    console.log(`✅ Stored chat ID for user ${userId}: ${chatId}`);
+  }
+
+  // Get user's chat ID
+  getUserChatId(userId) {
+    const chatIds = this.getStoredChatIds();
+    return chatIds[userId] ? chatIds[userId].chatId : null;
   }
 
   // Get pending verifications
@@ -181,11 +230,11 @@ class TelegramBotService {
   }
 
   // Send verification code via Telegram bot
-  async sendVerificationCode(phoneNumber, code) {
+  async sendVerificationCode(phoneNumber, code, userId = null) {
     try {
       const message = `🔐 Ваш код подтверждения для OnMyFeed: ${code}\n\nКод действителен 5 минут.`;
       
-      console.log(`🔐 Verification code for ${phoneNumber}: ${code}`);
+      console.log(`🔐 Verification code for ${phoneNumber} (user: ${userId}): ${code}`);
       console.log(`📱 Message that would be sent: ${message}`);
       
       // Check if bot is configured
@@ -206,14 +255,20 @@ class TelegramBotService {
         return { success: true, message: 'Code generated (bot API failed)' };
       }
 
-      // Try to send the message using automatic chat ID detection
-      let chatId = this.getBestChatId();
+      // Try to get user-specific chat ID first
+      let chatId = userId ? this.getUserChatId(userId) : null;
       
       if (!chatId) {
-        console.log('🔍 No chat ID found, trying to detect...');
-        // Try to detect chat ID one more time
-        await this.detectNewChatIds();
+        console.log('🔍 No user-specific chat ID, trying general detection...');
+        // Fallback to general chat ID detection
         chatId = this.getBestChatId();
+        
+        if (!chatId) {
+          console.log('🔍 No chat ID found, trying to detect...');
+          // Try to detect chat ID one more time
+          await this.detectNewChatIds();
+          chatId = this.getBestChatId();
+        }
       }
       
       if (!chatId) {
@@ -272,7 +327,7 @@ class TelegramBotService {
       this.storePendingVerification(phoneNumber, code, userId);
       
       // Send the code
-      const result = await this.sendVerificationCode(phoneNumber, code);
+      const result = await this.sendVerificationCode(phoneNumber, code, userId);
       
       if (result.success) {
         return { success: true, message: 'Verification code sent to your Telegram' };

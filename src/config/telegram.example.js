@@ -6,7 +6,7 @@ console.log('🔧 Environment token:', process.env.REACT_APP_TELEGRAM_BOT_TOKEN 
 console.log('🔧 Environment username:', process.env.REACT_APP_TELEGRAM_BOT_USERNAME ? 'Present' : 'Missing');
 
 export const TELEGRAM_CONFIG = {
-  BOT_TOKEN: '7982470197:AAFwBRp5pncR1t7yKKm942hhI6LBDFtyU78',
-  BOT_USERNAME: 'on_me_bot',
+  BOT_TOKEN: process.env.REACT_APP_TELEGRAM_BOT_TOKEN || '7982470197:AAFwBRp5pncR1t7yKKm942hhI6LBDFtyU78',
+  BOT_USERNAME: process.env.REACT_APP_TELEGRAM_BOT_USERNAME || 'on_me_bot',
   API_BASE: 'https://api.telegram.org/bot'
 }; 
