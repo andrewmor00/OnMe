@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # OnMyFeed - Social Media Analytics Platform
 
 A comprehensive React-based web application for social media analytics, blogger management, and account linking with Telegram integration.
@@ -198,3 +199,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 Made with ❤️ using React and modern web technologies.
+=======
+# OnMe
+>>>>>>> 41e453297dd69b2658a8aa6658a79eef7a898087
