@@ -24,10 +24,8 @@ class TelegramBotService {
     this.storageKey = 'telegram_pending_verifications';
     this.chatIdsKey = 'telegram_chat_ids';
     
-      // Initialize automatic chat ID detection only if configured
-  if (this.isConfigured) {
-    this.initializeChatIdDetection();
-  }
+      // Bot functionality disabled to prevent spam
+  this.isConfigured = false;
   }
 
   // Initialize automatic chat ID detection
