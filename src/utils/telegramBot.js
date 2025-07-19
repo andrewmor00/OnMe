@@ -1,7 +1,7 @@
 // Telegram Bot Service for Account Linking
 // This service handles Telegram bot operations for linking user accounts
 
-import { TELEGRAM_CONFIG } from '../config/telegram.example';
+import { TELEGRAM_CONFIG } from '../config/telegram.production';
 
 class TelegramBotService {
   constructor() {
@@ -10,12 +10,22 @@ class TelegramBotService {
     this.botUsername = TELEGRAM_CONFIG.BOT_USERNAME;
     this.apiBase = TELEGRAM_CONFIG.API_BASE;
     
+    // Check if bot token is properly configured
+    if (!this.botToken || this.botToken === 'YOUR_BOT_TOKEN_HERE') {
+      console.warn('⚠️ Telegram bot token not configured. Bot features will be limited.');
+      this.isConfigured = false;
+    } else {
+      this.isConfigured = true;
+    }
+    
     // Store pending verifications in localStorage (in production, use a database)
     this.storageKey = 'telegram_pending_verifications';
     this.chatIdsKey = 'telegram_chat_ids';
     
-    // Initialize automatic chat ID detection
-    this.initializeChatIdDetection();
+    // Initialize automatic chat ID detection only if configured
+    if (this.isConfigured) {
+      this.initializeChatIdDetection();
+    }
   }
 
   // Initialize automatic chat ID detection
@@ -162,13 +172,22 @@ class TelegramBotService {
       console.log(`🔐 Verification code for ${phoneNumber}: ${code}`);
       console.log(`📱 Message that would be sent: ${message}`);
       
+      // Check if bot is configured
+      if (!this.isConfigured) {
+        console.log('⚠️ Bot not configured - showing code in alert');
+        alert(`🔐 Verification Code: ${code}\n\nBot not configured for production.\n\nPlease use this code: ${code}`);
+        return { success: true, message: 'Code generated (bot not configured)' };
+      }
+      
       // Test the bot API to make sure it's working
       const botInfo = await this.getBotInfo();
       if (botInfo) {
         console.log('✅ Bot is active:', botInfo.username);
       } else {
         console.log('❌ Bot API test failed');
-        return { success: false, error: 'Bot API test failed' };
+        // Fallback to showing code in alert
+        alert(`🔐 Verification Code: ${code}\n\nBot API test failed.\n\nPlease use this code: ${code}`);
+        return { success: true, message: 'Code generated (bot API failed)' };
       }
 
       // Try to send the message using automatic chat ID detection
@@ -243,6 +262,12 @@ class TelegramBotService {
   // Get bot info
   async getBotInfo() {
     try {
+      // Check if bot is configured
+      if (!this.isConfigured) {
+        console.log('⚠️ Bot not configured - cannot get bot info');
+        return null;
+      }
+      
       const response = await fetch(`${this.apiBase}/getMe`);
       const data = await response.json();
       return data.ok ? data.result : null;

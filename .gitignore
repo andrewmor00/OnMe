@@ -109,6 +109,7 @@ Desktop.ini
 
 # Telegram bot token (security)
 src/config/telegram.js
+src/config/telegram.production.js
 # But include the example file for builds
 !src/config/telegram.example.js
 
