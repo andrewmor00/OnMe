@@ -15,6 +15,7 @@ class TelegramBotService {
       console.warn('⚠️ Telegram bot token not configured. Bot features will be limited.');
       this.isConfigured = false;
     } else {
+      console.log('✅ Bot token configured:', this.botToken.substring(0, 20) + '...');
       this.isConfigured = true;
     }
     
