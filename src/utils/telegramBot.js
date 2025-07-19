@@ -230,11 +230,11 @@ class TelegramBotService {
   }
 
   // Send verification code via Telegram bot
-  async sendVerificationCode(phoneNumber, code, userId = null) {
+  async sendVerificationCode(phoneNumber, code, userId = null, telegramUsername = null) {
     try {
       const message = `🔐 Ваш код подтверждения для OnMyFeed: ${code}\n\nКод действителен 5 минут.`;
       
-      console.log(`🔐 Verification code for ${phoneNumber} (user: ${userId}): ${code}`);
+      console.log(`🔐 Verification code for ${phoneNumber} (user: ${userId}, telegram: ${telegramUsername}): ${code}`);
       console.log(`📱 Message that would be sent: ${message}`);
       
       // Check if bot is configured
@@ -255,10 +255,46 @@ class TelegramBotService {
         return { success: true, message: 'Code generated (bot API failed)' };
       }
 
-      // For now, always show code in alert until proper user linking is implemented
-      console.log('⚠️ User-specific Telegram linking not implemented yet - showing code in alert');
-      alert(`🔐 Verification Code: ${code}\n\nTelegram linking not set up yet.\n\nPlease use this code: ${code}`);
-      return { success: true, message: 'Code generated (Telegram linking pending)' };
+      // Try to send via Telegram username if provided
+      if (telegramUsername) {
+        console.log(`📱 Attempting to send to Telegram username: @${telegramUsername}`);
+        
+        try {
+          const response = await fetch(`${this.apiUrl}/sendMessage`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              chat_id: `@${telegramUsername}`,
+              text: message,
+              parse_mode: 'HTML'
+            })
+          });
+
+          const result = await response.json();
+          
+          if (result.ok) {
+            console.log('✅ Message sent successfully via Telegram username');
+            return { success: true, message: 'Code sent via Telegram' };
+          } else {
+            console.log('❌ Failed to send via username:', result.description);
+            // Fallback to alert
+            alert(`🔐 Verification Code: ${code}\n\nCould not send to @${telegramUsername}.\n\nPlease use this code: ${code}`);
+            return { success: true, message: 'Code generated (username not found)' };
+          }
+        } catch (error) {
+          console.log('❌ Error sending via username:', error);
+          // Fallback to alert
+          alert(`🔐 Verification Code: ${code}\n\nError sending to @${telegramUsername}.\n\nPlease use this code: ${code}`);
+          return { success: true, message: 'Code generated (username error)' };
+        }
+      }
+
+      // Fallback: show code in alert if no username provided
+      console.log('⚠️ No Telegram username provided - showing code in alert');
+      alert(`🔐 Verification Code: ${code}\n\nNo Telegram username provided.\n\nPlease use this code: ${code}`);
+      return { success: true, message: 'Code generated (no username)' };
       
       console.log(`📱 Sending message to chat ID: ${chatId}`);
       
@@ -301,15 +337,17 @@ class TelegramBotService {
   }
 
   // Request verification code
-  async requestVerificationCode(phoneNumber, userId) {
+  async requestVerificationCode(phoneNumber, userId = null, telegramUsername = null) {
     try {
+      console.log(`📞 Requesting verification code for: ${phoneNumber} (user: ${userId}, telegram: ${telegramUsername})`);
+      
       const code = this.generateVerificationCode();
       
       // Store the verification
       this.storePendingVerification(phoneNumber, code, userId);
       
       // Send the code
-      const result = await this.sendVerificationCode(phoneNumber, code, userId);
+      const result = await this.sendVerificationCode(phoneNumber, code, userId, telegramUsername);
       
       if (result.success) {
         return { success: true, message: 'Verification code sent to your Telegram' };

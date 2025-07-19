@@ -8,6 +8,7 @@ import Profile from './pages/Profile.jsx';
 import CSVPage from './pages/CSVPage.jsx';
 import TelegramTest from './components/TelegramTest.jsx';
 import TelegramChatIdFinder from './components/TelegramChatIdFinder.jsx';
+import TelegramVerification from './components/TelegramVerification.jsx';
 import GoUpButton from './components/GoUpButton.jsx';
 import Footer from './components/Footer.jsx';
 import './App.css';
@@ -37,6 +38,7 @@ function App() {
             <Route path="/csv-manager" element={<CSVPage />} />
             <Route path="/telegram-test" element={<TelegramTest />} />
             <Route path="/telegram-chat-id" element={<TelegramChatIdFinder />} />
+            <Route path="/telegram-verification" element={<TelegramVerification />} />
           </Routes>
           <GoUpButton />
           <FooterWrapper />
