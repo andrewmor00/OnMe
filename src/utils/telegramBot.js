@@ -237,25 +237,7 @@ class TelegramBotService {
       console.log(`🔐 Verification code for ${phoneNumber} (user: ${userId}, telegram: ${telegramUsername}): ${code}`);
       console.log(`📱 Message that would be sent: ${message}`);
       
-      // Check if bot is configured
-      if (!this.isConfigured) {
-        console.log('⚠️ Bot not configured - showing code in alert');
-        alert(`🔐 Verification Code: ${code}\n\nBot not configured for production.\n\nPlease use this code: ${code}`);
-        return { success: true, message: 'Code generated (bot not configured)' };
-      }
-      
-      // Test the bot API to make sure it's working
-      const botInfo = await this.getBotInfo();
-      if (botInfo) {
-        console.log('✅ Bot is active:', botInfo.username);
-      } else {
-        console.log('❌ Bot API test failed');
-        // Fallback to showing code in alert
-        alert(`🔐 Verification Code: ${code}\n\nBot API test failed.\n\nPlease use this code: ${code}`);
-        return { success: true, message: 'Code generated (bot API failed)' };
-      }
-
-      // Try to send via Telegram username if provided
+      // Try to send via Telegram username if provided (even if bot not fully configured)
       if (telegramUsername) {
         console.log(`📱 Attempting to send to Telegram username: @${telegramUsername}`);
         
@@ -289,6 +271,24 @@ class TelegramBotService {
           alert(`🔐 Verification Code: ${code}\n\nError sending to @${telegramUsername}.\n\nPlease use this code: ${code}`);
           return { success: true, message: 'Code generated (username error)' };
         }
+      }
+
+      // Check if bot is configured for general use
+      if (!this.isConfigured) {
+        console.log('⚠️ Bot not configured - showing code in alert');
+        alert(`🔐 Verification Code: ${code}\n\nBot not configured for production.\n\nPlease use this code: ${code}`);
+        return { success: true, message: 'Code generated (bot not configured)' };
+      }
+      
+      // Test the bot API to make sure it's working
+      const botInfo = await this.getBotInfo();
+      if (botInfo) {
+        console.log('✅ Bot is active:', botInfo.username);
+      } else {
+        console.log('❌ Bot API test failed');
+        // Fallback to showing code in alert
+        alert(`🔐 Verification Code: ${code}\n\nBot API test failed.\n\nPlease use this code: ${code}`);
+        return { success: true, message: 'Code generated (bot API failed)' };
       }
 
       // Fallback: show code in alert if no username provided
