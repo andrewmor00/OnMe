@@ -49,11 +49,24 @@ const TelegramLinkModal = ({ isOpen, onClose, onSuccess }) => {
       if (result.success) {
         setStep('code');
         setCountdown(300); // 5 minutes
-        setSuccess('Verification code sent to your Telegram!');
-        // Extract the code from the alert message for display
-        const codeMatch = result.message.match(/Code: (\d{6})/);
-        if (codeMatch) {
-          setGeneratedCode(codeMatch[1]);
+        
+        // Check if there's an error message (indicating fallback to showing code)
+        if (result.error) {
+          setError(result.error);
+          setSuccess('Verification code generated! Please use the code below.');
+        } else {
+          setSuccess('Verification code sent to your Telegram!');
+        }
+        
+        // Set the generated code if provided in response
+        if (result.code) {
+          setGeneratedCode(result.code);
+        } else {
+          // Extract the code from the message for backward compatibility
+          const codeMatch = result.message.match(/code: (\d{6})/i);
+          if (codeMatch) {
+            setGeneratedCode(codeMatch[1]);
+          }
         }
       } else {
         setError(result.error);
@@ -114,7 +127,25 @@ const TelegramLinkModal = ({ isOpen, onClose, onSuccess }) => {
 
       if (result.success) {
         setCountdown(300);
-        setSuccess('New verification code sent to your Telegram!');
+        
+        // Check if there's an error message (indicating fallback to showing code)
+        if (result.error) {
+          setError(result.error);
+          setSuccess('New verification code generated! Please use the code below.');
+        } else {
+          setSuccess('New verification code sent to your Telegram!');
+        }
+        
+        // Set the generated code if provided in response
+        if (result.code) {
+          setGeneratedCode(result.code);
+        } else {
+          // Extract the code from the message for backward compatibility
+          const codeMatch = result.message.match(/code: (\d{6})/i);
+          if (codeMatch) {
+            setGeneratedCode(codeMatch[1]);
+          }
+        }
       } else {
         setError(result.error);
       }
@@ -176,7 +207,7 @@ const TelegramLinkModal = ({ isOpen, onClose, onSuccess }) => {
                   placeholder="username (without @)"
                   className="username-input"
                 />
-                <small>If provided, code will be sent to your Telegram. Otherwise, shown in alert.</small>
+                <small>If provided, code will be sent to your Telegram. Otherwise, code will be displayed here.</small>
               </div>
 
               {error && <div className="error-message">{error}</div>}
@@ -199,7 +230,7 @@ const TelegramLinkModal = ({ isOpen, onClose, onSuccess }) => {
                 <p>Enter the 6-digit verification code</p>
                 {generatedCode && (
                   <div className="generated-code-display">
-                    <p><strong>Generated Code:</strong></p>
+                    <p><strong>🔐 Verification Code:</strong></p>
                     <div className="code-box">{generatedCode}</div>
                     <p style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
                       💡 This code would normally be sent to your Telegram
@@ -250,6 +281,14 @@ const TelegramLinkModal = ({ isOpen, onClose, onSuccess }) => {
             <p>💡 Make sure you have our bot @{TELEGRAM_CONFIG.BOT_USERNAME} in your Telegram contacts</p>
             <p>🔒 Your data is secure and will only be used for account linking</p>
             <p>📱 Verification codes are sent to your Telegram account</p>
+            {error && error.includes('Error sending to @') && (
+              <div className="bot-notification">
+                <p>⚠️ Could not send code to Telegram. Please check the username or use the code displayed above.</p>
+                <p style={{ marginTop: '8px', fontSize: '10px' }}>
+                  💡 To receive messages: 1) Start a chat with @{TELEGRAM_CONFIG.BOT_USERNAME} 2) Send /start 3) Try linking again
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>

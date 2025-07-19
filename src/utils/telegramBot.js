@@ -243,7 +243,7 @@ class TelegramBotService {
         console.log(`📱 Attempting to send to Telegram username: @${telegramUsername}`);
         
         try {
-          const response = await fetch(`${this.apiUrl}/sendMessage`, {
+          const response = await fetch(`${this.apiBase}${this.botToken}/sendMessage`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -262,23 +262,46 @@ class TelegramBotService {
             return { success: true, message: 'Code sent via Telegram' };
           } else {
             console.log('❌ Failed to send via username:', result.description);
-            // Fallback to alert
-            alert(`🔐 Verification Code: ${code}\n\nCould not send to @${telegramUsername}.\n\nPlease use this code: ${code}`);
-            return { success: true, message: 'Code generated (username not found)' };
+            
+            // Provide more specific error messages
+            let errorMessage = `Error sending to @${telegramUsername}`;
+            if (result.error_code === 400) {
+              errorMessage = `Username @${telegramUsername} not found or bot blocked`;
+            } else if (result.error_code === 403) {
+              errorMessage = `Bot blocked by @${telegramUsername}`;
+            } else if (result.error_code === 429) {
+              errorMessage = `Rate limit exceeded. Please try again later.`;
+            }
+            
+            // Return the code in the response instead of showing alert
+            return { 
+              success: true, 
+              message: `Could not send to @${telegramUsername}. Please use this code: ${code}`,
+              code: code,
+              error: errorMessage
+            };
           }
         } catch (error) {
           console.log('❌ Error sending via username:', error);
-          // Fallback to alert
-          alert(`🔐 Verification Code: ${code}\n\nError sending to @${telegramUsername}.\n\nPlease use this code: ${code}`);
-          return { success: true, message: 'Code generated (username error)' };
+          // Return the code in the response instead of showing alert
+          return { 
+            success: true, 
+            message: `Error sending to @${telegramUsername}. Please use this code: ${code}`,
+            code: code,
+            error: `Error sending to @${telegramUsername}`
+          };
         }
       }
 
       // Check if bot is configured for general use
       if (!this.isConfigured) {
-        console.log('⚠️ Bot not configured - showing code in alert');
-        alert(`🔐 Verification Code: ${code}\n\nBot not configured for production.\n\nPlease use this code: ${code}`);
-        return { success: true, message: 'Code generated (bot not configured)' };
+        console.log('⚠️ Bot not configured - returning code in response');
+        return { 
+          success: true, 
+          message: `Bot not configured for production. Please use this code: ${code}`,
+          code: code,
+          error: 'Bot not configured'
+        };
       }
       
       // Test the bot API to make sure it's working
@@ -287,15 +310,23 @@ class TelegramBotService {
         console.log('✅ Bot is active:', botInfo.username);
       } else {
         console.log('❌ Bot API test failed');
-        // Fallback to showing code in alert
-        alert(`🔐 Verification Code: ${code}\n\nBot API test failed.\n\nPlease use this code: ${code}`);
-        return { success: true, message: 'Code generated (bot API failed)' };
+        // Return code in response instead of alert
+        return { 
+          success: true, 
+          message: `Bot API test failed. Please use this code: ${code}`,
+          code: code,
+          error: 'Bot API test failed'
+        };
       }
 
-      // Fallback: show code in alert if no username provided
-      console.log('⚠️ No Telegram username provided - showing code in alert');
-      alert(`🔐 Verification Code: ${code}\n\nNo Telegram username provided.\n\nPlease use this code: ${code}`);
-      return { success: true, message: 'Code generated (no username)' };
+      // Fallback: return code in response if no username provided
+      console.log('⚠️ No Telegram username provided - returning code in response');
+      return { 
+        success: true, 
+        message: `No Telegram username provided. Please use this code: ${code}`,
+        code: code,
+        error: 'No Telegram username provided'
+      };
     } catch (error) {
       console.error('Error sending verification code:', error);
       return { success: false, error: 'Failed to send verification code' };
