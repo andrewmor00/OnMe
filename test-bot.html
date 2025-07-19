@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bot Token Test</title>
+</head>
+<body>
+    <h1>Bot Token Test</h1>
+    <button onclick="testBot()">Test Bot Token</button>
+    <div id="result"></div>
+
+    <script>
+        async function testBot() {
+            const token = '7982470197:AAFwBRp5pncR1t7yKKm942hhI6LBDFtyU78';
+            const url = `https://api.telegram.org/bot${token}/getMe`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.ok) {
+                    document.getElementById('result').innerHTML = `
+                        <h3>✅ Bot Working!</h3>
+                        <p><strong>Name:</strong> ${data.result.first_name}</p>
+                        <p><strong>Username:</strong> @${data.result.username}</p>
+                        <p><strong>ID:</strong> ${data.result.id}</p>
+                    `;
+                } else {
+                    document.getElementById('result').innerHTML = `
+                        <h3>❌ Bot Error</h3>
+                        <p><strong>Error:</strong> ${data.description}</p>
+                        <p><strong>Error Code:</strong> ${data.error_code}</p>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <h3>❌ Network Error</h3>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html> 
