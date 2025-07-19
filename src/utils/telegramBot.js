@@ -255,28 +255,10 @@ class TelegramBotService {
         return { success: true, message: 'Code generated (bot API failed)' };
       }
 
-      // Try to get user-specific chat ID first
-      let chatId = userId ? this.getUserChatId(userId) : null;
-      
-      if (!chatId) {
-        console.log('🔍 No user-specific chat ID, trying general detection...');
-        // Fallback to general chat ID detection
-        chatId = this.getBestChatId();
-        
-        if (!chatId) {
-          console.log('🔍 No chat ID found, trying to detect...');
-          // Try to detect chat ID one more time
-          await this.detectNewChatIds();
-          chatId = this.getBestChatId();
-        }
-      }
-      
-      if (!chatId) {
-        console.log('❌ No chat ID found. Please send a message to @on_me_bot first.');
-        // Fallback to showing code in alert
-        alert(`🔐 Verification Code: ${code}\n\nNo chat ID found. Please send a message to @on_me_bot first.\n\nPlease use this code: ${code}`);
-        return { success: true, message: 'Code generated (no chat ID found)' };
-      }
+      // For now, always show code in alert until proper user linking is implemented
+      console.log('⚠️ User-specific Telegram linking not implemented yet - showing code in alert');
+      alert(`🔐 Verification Code: ${code}\n\nTelegram linking not set up yet.\n\nPlease use this code: ${code}`);
+      return { success: true, message: 'Code generated (Telegram linking pending)' };
       
       console.log(`📱 Sending message to chat ID: ${chatId}`);
       
