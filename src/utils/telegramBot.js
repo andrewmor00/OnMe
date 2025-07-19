@@ -24,17 +24,16 @@ class TelegramBotService {
     this.storageKey = 'telegram_pending_verifications';
     this.chatIdsKey = 'telegram_chat_ids';
     
-      // Bot functionality disabled to prevent spam
-  this.isConfigured = false;
+      // Initialize automatic chat ID detection only if configured
+  if (this.isConfigured) {
+    this.initializeChatIdDetection();
+  }
   }
 
   // Initialize automatic chat ID detection
   initializeChatIdDetection() {
-    // Check for updates immediately and then every 10 seconds
+    // Only check once on startup, no polling
     this.detectNewChatIds();
-    setInterval(() => {
-      this.detectNewChatIds();
-    }, 10000);
   }
 
   // Detect new chat IDs from bot updates
@@ -444,9 +443,9 @@ class TelegramBotService {
 // Create singleton instance
 const telegramBotService = new TelegramBotService();
 
-// Clean up expired verifications every minute
+// Clean up expired verifications every 5 minutes (less frequent)
 setInterval(() => {
   telegramBotService.cleanupExpiredVerifications();
-}, 60000);
+}, 300000);
 
 export default telegramBotService; 
