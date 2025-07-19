@@ -1,0 +1,21 @@
+.csv-page {
+  min-height: 100vh;
+  background: #f4f0ff;
+  padding: 20px 0;
+}
+
+.csv-page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+@media (max-width: 768px) {
+  .csv-page {
+    padding: 10px 0;
+  }
+  
+  .csv-page-container {
+    padding: 0 15px;
+  }
+} 

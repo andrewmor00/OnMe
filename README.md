@@ -1,70 +1,200 @@
-# Getting Started with Create React App
+# OnMyFeed - Social Media Analytics Platform
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A comprehensive React-based web application for social media analytics, blogger management, and account linking with Telegram integration.
 
-## Available Scripts
+## 🚀 Features
 
-In the project directory, you can run:
+### 📊 Analytics Dashboard
+- **CSV Data Integration**: Import and manage blogger data from CSV files
+- **Real-time Statistics**: View total bloggers, subscribers, and posts
+- **Filtering & Sorting**: Advanced search and filter capabilities for blogger data
+- **Data Visualization**: Interactive charts and graphs
 
-### `npm start`
+### 🔗 Social Media Integration
+- **Multi-Platform Support**: VK, Telegram, Rutube, Dzen, YouTube
+- **Account Linking**: Secure OAuth-style linking with verification codes
+- **Telegram Bot Integration**: Real-time verification codes via Telegram bot
+- **Profile Management**: Connect and disconnect social accounts
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 👤 User Management
+- **Profile System**: User profiles with activity tracking
+- **Settings Management**: User preferences and account settings
+- **Activity Logging**: Track user actions and connections
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 🎨 Modern UI/UX
+- **Responsive Design**: Works on desktop, tablet, and mobile
+- **Modern Interface**: Clean, intuitive user interface
+- **Dark/Light Themes**: Customizable appearance
+- **Accessibility**: WCAG compliant design
 
-### `npm test`
+## 🛠️ Technology Stack
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **Frontend**: React 18, React Router, CSS3
+- **State Management**: React Context API
+- **Data Storage**: LocalStorage, CSV parsing
+- **External APIs**: Telegram Bot API
+- **Build Tool**: Create React App
 
-### `npm run build`
+## 📦 Installation
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Prerequisites
+- Node.js (v14 or higher)
+- npm or yarn
+- Git
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Setup Steps
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/onmyfeed.git
+   cd onmyfeed
+   ```
 
-### `npm run eject`
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+3. **Configure Telegram Bot** (Optional)
+   - Create a Telegram bot via @BotFather
+   - Copy your bot token
+   - Create `src/config/telegram.js`:
+   ```javascript
+   export const TELEGRAM_CONFIG = {
+     BOT_TOKEN: 'your_bot_token_here',
+     BOT_USERNAME: 'your_bot_username',
+     API_BASE: 'https://api.telegram.org/bot'
+   };
+   ```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+4. **Start development server**
+   ```bash
+   npm start
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+5. **Open in browser**
+   ```
+   http://localhost:3000
+   ```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 🔧 Configuration
 
-## Learn More
+### Telegram Bot Setup
+1. Message @BotFather on Telegram
+2. Create a new bot with `/newbot`
+3. Get your bot token
+4. Update `src/config/telegram.js` with your token
+5. Start a chat with your bot in Telegram
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### CSV Data Import
+1. Go to `/csv-manager` in the app
+2. Upload your CSV file with blogger data
+3. Data will be automatically parsed and stored
+4. View analytics in the main dashboard
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 📱 Usage
 
-### Code Splitting
+### Main Dashboard
+- View overall statistics and analytics
+- Access quick actions and shortcuts
+- Monitor connected accounts
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Blogger Management
+- Import CSV data with blogger information
+- Filter and search through blogger database
+- View detailed statistics and metrics
 
-### Analyzing the Bundle Size
+### Account Linking
+- Connect social media accounts
+- Use Telegram verification for secure linking
+- Manage connected accounts and permissions
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Profile Settings
+- Update user profile information
+- Manage account preferences
+- View activity history
 
-### Making a Progressive Web App
+## 🔐 Security Features
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+- **Telegram Verification**: Secure 2FA-style account linking
+- **Token Protection**: Bot tokens stored in separate config files
+- **Data Privacy**: Local storage with user consent
+- **Input Validation**: Comprehensive form validation
 
-### Advanced Configuration
+## 📊 Data Structure
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### CSV Format
+```csv
+username,platform,subscribers,posts,engagement_rate
+john_doe,instagram,50000,150,4.2
+jane_smith,youtube,120000,89,3.8
+```
 
-### Deployment
+### Local Storage
+- User preferences and settings
+- Connected account tokens
+- Analytics data and statistics
+- Telegram chat IDs for verification
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## 🚀 Deployment
 
-### `npm run build` fails to minify
+### Build for Production
+```bash
+npm run build
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Deploy to GitHub Pages
+1. Install gh-pages: `npm install --save-dev gh-pages`
+2. Add to package.json:
+   ```json
+   "homepage": "https://yourusername.github.io/onmyfeed",
+   "scripts": {
+     "predeploy": "npm run build",
+     "deploy": "gh-pages -d build"
+   }
+   ```
+3. Deploy: `npm run deploy`
+
+### Deploy to Netlify/Vercel
+1. Connect your GitHub repository
+2. Set build command: `npm run build`
+3. Set publish directory: `build`
+4. Deploy automatically on push
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Commit changes: `git commit -am 'Add feature'`
+4. Push to branch: `git push origin feature-name`
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+- **Issues**: Report bugs via GitHub Issues
+- **Documentation**: Check the `/docs` folder for detailed guides
+- **Telegram**: Contact @your_bot_username for support
+
+## 🔄 Changelog
+
+### v1.0.0 (Current)
+- Initial release
+- Core analytics functionality
+- Telegram bot integration
+- CSV data management
+- Social media account linking
+
+## 📞 Contact
+
+- **Developer**: Your Name
+- **Email**: your.email@example.com
+- **Telegram**: @your_username
+- **Website**: https://yourwebsite.com
+
+---
+
+Made with ❤️ using React and modern web technologies.
