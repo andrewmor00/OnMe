@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import telegramBotService from '../utils/telegramBot';
-import { TELEGRAM_CONFIG } from '../config/telegram.example';
+import { TELEGRAM_CONFIG } from '../config/telegram';
 
 const TelegramTest = () => {
   const [botInfo, setBotInfo] = useState(null);
