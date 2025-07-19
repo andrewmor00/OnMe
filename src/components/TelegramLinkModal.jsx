@@ -285,7 +285,15 @@ const TelegramLinkModal = ({ isOpen, onClose, onSuccess }) => {
               <div className="bot-notification">
                 <p>⚠️ Could not send code to Telegram. Please check the username or use the code displayed above.</p>
                 <p style={{ marginTop: '8px', fontSize: '10px' }}>
-                  💡 To receive messages: 1) Start a chat with @{TELEGRAM_CONFIG.BOT_USERNAME} 2) Send /start 3) Try linking again
+                  💡 To receive messages: 1) Open Telegram 2) Search for @{TELEGRAM_CONFIG.BOT_USERNAME} 3) Send /start 4) Try linking again
+                </p>
+              </div>
+            )}
+            {error && error.includes('Please start a chat') && (
+              <div className="bot-notification">
+                <p>📱 Please start a conversation with our bot first!</p>
+                <p style={{ marginTop: '8px', fontSize: '10px' }}>
+                  🔗 Open Telegram → Search @{TELEGRAM_CONFIG.BOT_USERNAME} → Send /start → Try again
                 </p>
               </div>
             )}
