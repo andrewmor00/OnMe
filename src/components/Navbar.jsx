@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useStorage } from '../context/StorageContext';
 import Logo from '../img/Logo.png';
 
 const Navbar = () => {
-  const location = useLocation();
+  // const location = useLocation();
   const navigate = useNavigate();
   const { isLoggedIn, user, logout, addActivity } = useStorage();
   const [activeSection, setActiveSection] = useState('main');

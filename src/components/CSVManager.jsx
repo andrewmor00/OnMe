@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import csvDB from '../utils/csvDatabase';
 import CSVWelcome from './CSVWelcome';
 import './CSVManager.css';
@@ -16,15 +16,17 @@ const CSVManager = () => {
   const [loading, setLoading] = useState(false);
   const [importStatus, setImportStatus] = useState({});
 
-  useEffect(() => {
-    loadData();
-  }, [selectedType]);
-
-  const loadData = () => {
+  const loadData = useCallback(() => {
     const allData = csvDB.getAll(selectedType);
     setData(allData);
     setCurrentPage(1);
-  };
+  }, [selectedType]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+
 
   const handleFileImport = async (event, type) => {
     const file = event.target.files[0];
@@ -115,9 +117,9 @@ const CSVManager = () => {
     csvDB.downloadCSV(type);
   };
 
-  const getStatistics = () => {
-    return csvDB.getStatisticsSummary();
-  };
+  // const getStatistics = () => {
+  //   return csvDB.getStatisticsSummary();
+  // };
 
   const renderDataTable = () => {
     if (data.length === 0) {

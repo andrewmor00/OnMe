@@ -300,7 +300,7 @@ const Login = () => {
                   onChange={handleInputChange}
                 /> Запомнить меня
               </label>
-              <a href="#" className="login2-link login2-link-forgot">Забыли пароль?</a>
+              <button type="button" className="login2-link login2-link-forgot" style={{ background: 'none', border: 'none', color: '#7c2ae8', cursor: 'pointer', padding: 0 }}>Забыли пароль?</button>
             </div>
             <button type="submit" className="login2-btn" disabled={loading}>
               {loading ? 'Вход...' : 'Войти'}

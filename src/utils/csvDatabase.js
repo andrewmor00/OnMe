@@ -125,7 +125,7 @@ class CSVDatabase {
         if (typeof filterValue === 'string') {
           return itemValue && itemValue.toLowerCase().includes(filterValue.toLowerCase());
         } else if (typeof filterValue === 'number') {
-          return itemValue == filterValue;
+          return itemValue === filterValue;
         } else if (Array.isArray(filterValue)) {
           return filterValue.includes(itemValue);
         }

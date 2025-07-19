@@ -18,7 +18,7 @@ const ProfileHome = () => {
     connectedAccounts, 
     connectAccount, 
     disconnectAccount,
-    trendingData, 
+    // trendingData, 
     analyticsData,
     addActivity 
   } = useStorage();
@@ -227,21 +227,21 @@ const ProfileHome = () => {
             <h3>Полезные статьи</h3>
             <div className="articles-list">
               <div className="article-item">
-                <img className="article-thumbnail" src={ProfileFakeInfo}/>
+                <img className="article-thumbnail" src={ProfileFakeInfo} alt="Article thumbnail"/>
                 <div className="article-content">
                   <h4>Час пробил: в какое время публиковать посты в разных соцсетях, чтоб «залетели»</h4>
                   <p>Как запрещённые, так и разрешённые в России соцсети кричат начинающему блогеру....</p>
                 </div>
               </div>
               <div className="article-item">
-                <img className="article-thumbnail" src={ProfileFakeInfo}/>
+                <img className="article-thumbnail" src={ProfileFakeInfo} alt="Article thumbnail"/>
                 <div className="article-content">
                   <h4>Час пробил: в какое время публиковать посты в разных соцсетях, чтоб «залетели»</h4>
                   <p>Как запрещённые, так и разрешённые в России соцсети кричат начинающему блогеру....</p>
                 </div>
               </div>
               <div className="article-item">
-                <img className="article-thumbnail" src={ProfileFakeInfo}/>
+                <img className="article-thumbnail" src={ProfileFakeInfo} alt="Article thumbnail"/>
                 <div className="article-content">
                   <h4>Час пробил: в какое время публиковать посты в разных соцсетях, чтоб «залетели»</h4>
                   <p>Как запрещённые, так и разрешённые в России соцсети кричат начинающему блогеру....</p>

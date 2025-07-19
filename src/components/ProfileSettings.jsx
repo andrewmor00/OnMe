@@ -8,7 +8,7 @@ const ProfileSettings = () => {
     userProfile, 
     updateProfile, 
     notifications, 
-    updateNotifications, 
+    // updateNotifications, 
     toggleNotification,
     securitySettings,
     updateSecuritySetting,

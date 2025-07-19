@@ -8,7 +8,7 @@ import Tariffs from '../components/Tariffs.jsx';
 
 
 const Home = () => {
-  const [authOpen, setAuthOpen] = useState(false);
+  const [, setAuthOpen] = useState(false);
 
   return (
     <>

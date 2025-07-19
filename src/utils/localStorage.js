@@ -937,7 +937,7 @@ export const analyticsStorage = {
   }
 };
 
-export default {
+const storageManager = {
   authStorage,
   profileStorage,
   accountsStorage,
@@ -952,4 +952,5 @@ export default {
   draftStorage,
   bookmarksStorage,
   storageUtils
-}; 
+};
+export default storageManager;; 
