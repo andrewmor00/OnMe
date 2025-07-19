@@ -1,7 +1,7 @@
 // Telegram Bot Service for Account Linking
 // This service handles Telegram bot operations for linking user accounts
 
-import { TELEGRAM_CONFIG } from '../config/telegram.production';
+import { TELEGRAM_CONFIG } from '../config/telegram.example';
 
 class TelegramBotService {
   constructor() {
