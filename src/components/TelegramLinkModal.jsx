@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import telegramBot from '../utils/telegramBot';
-import { TELEGRAM_CONFIG } from '../config/telegram';
+import { TELEGRAM_CONFIG } from '../config/telegram.example';
 import './TelegramLinkModal.css';
 
 const TelegramLinkModal = ({ isOpen, onClose, onSuccess }) => {
