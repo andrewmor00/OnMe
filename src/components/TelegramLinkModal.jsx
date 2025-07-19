@@ -6,6 +6,7 @@ import './TelegramLinkModal.css';
 const TelegramLinkModal = ({ isOpen, onClose, onSuccess }) => {
   const [step, setStep] = useState('phone'); // 'phone' or 'code'
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [telegramUsername, setTelegramUsername] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [generatedCode, setGeneratedCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -40,7 +41,9 @@ const TelegramLinkModal = ({ isOpen, onClose, onSuccess }) => {
       // Request verification code
       const result = await telegramBot.sendVerificationCode(
         cleanPhone, 
-        code
+        code,
+        null, // userId
+        telegramUsername.trim() || null // telegramUsername
       );
 
       if (result.success) {
@@ -104,7 +107,9 @@ const TelegramLinkModal = ({ isOpen, onClose, onSuccess }) => {
       
       const result = await telegramBot.sendVerificationCode(
         cleanPhone, 
-        code
+        code,
+        null, // userId
+        telegramUsername.trim() || null // telegramUsername
       );
 
       if (result.success) {
@@ -160,6 +165,18 @@ const TelegramLinkModal = ({ isOpen, onClose, onSuccess }) => {
                   required
                 />
                 <small>Enter the phone number associated with your Telegram account</small>
+              </div>
+
+              <div className="form-group">
+                <label>Telegram Username (Optional)</label>
+                <input
+                  type="text"
+                  value={telegramUsername}
+                  onChange={(e) => setTelegramUsername(e.target.value)}
+                  placeholder="username (without @)"
+                  className="username-input"
+                />
+                <small>If provided, code will be sent to your Telegram. Otherwise, shown in alert.</small>
               </div>
 
               {error && <div className="error-message">{error}</div>}
