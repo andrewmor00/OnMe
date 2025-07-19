@@ -7,6 +7,7 @@ const TelegramTest = () => {
   const [testCode, setTestCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState('');
+  const [chatId, setChatId] = useState('');
 
   useEffect(() => {
     testBotConnection();
@@ -22,9 +23,32 @@ const TelegramTest = () => {
     }
   };
 
+  const detectChatIds = async () => {
+    try {
+      const chatIds = await telegramBotService.forceDetectChatIds();
+      setResult(`🔍 Chat ID detection result: ${JSON.stringify(chatIds, null, 2)}`);
+    } catch (error) {
+      setResult(`❌ Chat ID detection failed: ${error.message}`);
+    }
+  };
+
   const testCodeGeneration = async () => {
     setLoading(true);
     try {
+      // If chat ID is provided, store it
+      if (chatId) {
+        const chatIds = telegramBotService.getStoredChatIds();
+        chatIds[chatId] = {
+          username: 'Manual Input',
+          firstName: 'User',
+          lastName: '',
+          lastMessage: 'Manual chat ID',
+          timestamp: Date.now()
+        };
+        telegramBotService.storeChatIds(chatIds);
+        console.log(`✅ Manual chat ID stored: ${chatId}`);
+      }
+      
       const result = await telegramBotService.requestVerificationCode('1234567890', 'test_user');
       setResult(`🔐 Test result: ${JSON.stringify(result, null, 2)}`);
     } catch (error) {
@@ -47,7 +71,7 @@ const TelegramTest = () => {
         <h3>Bot Configuration</h3>
         <p><strong>Token:</strong> {TELEGRAM_CONFIG.BOT_TOKEN.substring(0, 20)}...</p>
         <p><strong>Username:</strong> @{TELEGRAM_CONFIG.BOT_USERNAME}</p>
-        <p><strong>Name:</strong> {TELEGRAM_CONFIG.BOT_NAME}</p>
+        <p><strong>Name:</strong> {botInfo ? botInfo.first_name : 'Loading...'}</p>
       </div>
 
       <div style={{ marginBottom: '20px' }}>
@@ -61,13 +85,29 @@ const TelegramTest = () => {
             ❌ Not connected
           </div>
         )}
-        <button onClick={testBotConnection} style={{ marginTop: '10px', padding: '8px 16px' }}>
+        <button onClick={testBotConnection} style={{ marginTop: '10px', padding: '8px 16px', marginRight: '10px' }}>
           Test Connection
+        </button>
+        <button onClick={detectChatIds} style={{ marginTop: '10px', padding: '8px 16px' }}>
+          Detect Chat IDs
         </button>
       </div>
 
       <div style={{ marginBottom: '20px' }}>
         <h3>Code Generation Test</h3>
+        <div style={{ marginBottom: '10px' }}>
+          <label>Chat ID (optional): </label>
+          <input
+            type="text"
+            value={chatId}
+            onChange={(e) => setChatId(e.target.value)}
+            placeholder="Enter your Telegram chat ID"
+            style={{ padding: '8px', marginLeft: '10px', width: '200px' }}
+          />
+          <p style={{ fontSize: '12px', color: '#666', marginTop: '5px' }}>
+            Leave empty to use automatic detection, or enter your chat ID manually
+          </p>
+        </div>
         <button 
           onClick={testCodeGeneration} 
           disabled={loading}

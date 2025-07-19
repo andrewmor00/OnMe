@@ -31,17 +31,21 @@ class TelegramBotService {
 
   // Initialize automatic chat ID detection
   initializeChatIdDetection() {
-    // Check for updates every 30 seconds to detect new messages
+    // Check for updates immediately and then every 10 seconds
+    this.detectNewChatIds();
     setInterval(() => {
       this.detectNewChatIds();
-    }, 30000);
+    }, 10000);
   }
 
   // Detect new chat IDs from bot updates
   async detectNewChatIds() {
     try {
-      const response = await fetch(`${this.apiBase}/getUpdates`);
+      console.log('🔍 Detecting chat IDs...');
+      const response = await fetch(`${this.apiBase}${this.botToken}/getUpdates`);
       const data = await response.json();
+      
+      console.log('🔍 Updates response:', data);
       
       if (data.ok && data.result.length > 0) {
         const chatIds = this.getStoredChatIds();
@@ -69,9 +73,11 @@ class TelegramBotService {
         if (newChatsFound) {
           this.storeChatIds(chatIds);
         }
+      } else {
+        console.log('🔍 No updates found. Send a message to your bot first.');
       }
     } catch (error) {
-      console.log('Chat ID detection error:', error.message);
+      console.log('❌ Chat ID detection error:', error.message);
     }
   }
 
@@ -103,6 +109,15 @@ class TelegramBotService {
   // Get all available chat IDs
   getAllChatIds() {
     return this.getStoredChatIds();
+  }
+
+  // Manually trigger chat ID detection
+  async forceDetectChatIds() {
+    console.log('🔍 Force detecting chat IDs...');
+    await this.detectNewChatIds();
+    const chatIds = this.getStoredChatIds();
+    console.log('🔍 Available chat IDs:', Object.keys(chatIds));
+    return chatIds;
   }
 
   // Generate a random verification code
@@ -192,7 +207,14 @@ class TelegramBotService {
       }
 
       // Try to send the message using automatic chat ID detection
-      const chatId = this.getBestChatId();
+      let chatId = this.getBestChatId();
+      
+      if (!chatId) {
+        console.log('🔍 No chat ID found, trying to detect...');
+        // Try to detect chat ID one more time
+        await this.detectNewChatIds();
+        chatId = this.getBestChatId();
+      }
       
       if (!chatId) {
         console.log('❌ No chat ID found. Please send a message to @on_me_bot first.');
@@ -204,7 +226,10 @@ class TelegramBotService {
       console.log(`📱 Sending message to chat ID: ${chatId}`);
       
       try {
-        const response = await fetch(`${this.apiBase}/sendMessage`, {
+        console.log(`📱 Sending message to chat ID: ${chatId}`);
+        console.log(`📱 Message: ${message}`);
+        
+        const response = await fetch(`${this.apiBase}${this.botToken}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -269,11 +294,22 @@ class TelegramBotService {
         return null;
       }
       
-      const response = await fetch(`${this.apiBase}/getMe`);
+      console.log('🔧 Fetching bot info from:', `${this.apiBase}${this.botToken}/getMe`);
+      
+      const response = await fetch(`${this.apiBase}${this.botToken}/getMe`);
       const data = await response.json();
-      return data.ok ? data.result : null;
+      
+      console.log('🔧 Bot API response:', data);
+      
+      if (data.ok) {
+        console.log('✅ Bot info retrieved successfully:', data.result);
+        return data.result;
+      } else {
+        console.log('❌ Bot API error:', data.description);
+        return null;
+      }
     } catch (error) {
-      console.error('Error getting bot info:', error);
+      console.error('❌ Error getting bot info:', error);
       return null;
     }
   }
