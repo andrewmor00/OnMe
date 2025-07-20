@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useStorage } from '../context/StorageContext';
 import csvDB from '../utils/csvDatabase';
-import TelegramLinkModal from './TelegramLinkModal';
 import ProfileMan from '../img/ProfileMan.png';
 import VK from '../img/VK.png';
-import Telegram from '../img/Telegram.png';
 import Rutube from '../img/Rutube.png';
 import Dzen from '../img/Dzen.png';
 import Youtube from '../img/Youtube.png';
@@ -25,7 +23,6 @@ const ProfileHome = () => {
 
   const [csvStats, setCsvStats] = useState(null);
   const [topUsers, setTopUsers] = useState([]);
-  const [showTelegramModal, setShowTelegramModal] = useState(false);
 
   useEffect(() => {
     // Load CSV data
@@ -37,14 +34,9 @@ const ProfileHome = () => {
 
   const handleConnectAccount = (platform) => {
     console.log('handleConnectAccount called with platform:', platform);
-    if (platform === 'Telegram') {
-      console.log('Opening Telegram modal...');
-      setShowTelegramModal(true);
-    } else {
-      const username = `@user_${platform.toLowerCase()}`;
-      connectAccount(platform, username, `token_${platform}`);
-      addActivity('account_connected', { platform });
-    }
+    const username = `@user_${platform.toLowerCase()}`;
+    connectAccount(platform, username, `token_${platform}`);
+    addActivity('account_connected', { platform });
   };
 
   const handleDisconnectAccount = (platform) => {
@@ -53,11 +45,7 @@ const ProfileHome = () => {
     addActivity('account_disconnected', { platform });
   };
 
-  const handleTelegramSuccess = (accountData) => {
-    connectAccount(accountData.platform, accountData.username, accountData.phoneNumber);
-    addActivity('account_connected', { platform: 'Telegram' });
-    setShowTelegramModal(false);
-  };
+
 
   const getConnectedCount = () => {
     return connectedAccounts.filter(account => account.status === 'connected').length;
@@ -86,26 +74,7 @@ const ProfileHome = () => {
             <img src={ProfileMan} alt="Analytics Illustration" className="analytics-illustration-img" />
           </div>
           <div className="card-content">
-            {csvStats && csvStats.totalUsers > 0 ? (
-              <div>
-                <h3>Статистика базы данных</h3>
-                <div className="analytics-summary">
-                  <div className="stat-item">
-                    <span className="stat-number">{csvStats.totalUsers}</span>
-                    <span className="stat-label">Блогеров</span>
-                  </div>
-                  <div className="stat-item">
-                    <span className="stat-number">{csvStats.totalSubscribers.toLocaleString()}</span>
-                    <span className="stat-label">Подписчиков</span>
-                  </div>
-                  <div className="stat-item">
-                    <span className="stat-number">{csvStats.totalPosts}</span>
-                    <span className="stat-label">Постов</span>
-                  </div>
-                </div>
-
-              </div>
-            ) : getConnectedCount() > 0 ? (
+            {getConnectedCount() > 0 ? (
               <div>
                 <h3>Статистика аккаунта</h3>
                 <div className="analytics-summary">
@@ -127,26 +96,7 @@ const ProfileHome = () => {
               <p>Здесь будут приведены показатели постов, которое вы загрузите последним, и аккаунта в целом.</p>
             )}
 
-            <button 
-              className="add-account-btn" 
-              style={{ marginLeft: '10px', backgroundColor: '#0088cc' }}
-              onClick={() => {
-                console.log('Test button clicked');
-                setShowTelegramModal(true);
-              }}
-            >
-              Test Telegram Modal
-            </button>
-            <button 
-              className="add-account-btn" 
-              style={{ marginLeft: '10px', backgroundColor: '#dc3545' }}
-              onClick={() => {
-                console.log('Force disconnect Telegram');
-                disconnectAccount('Telegram');
-              }}
-            >
-              Disconnect Telegram
-            </button>
+            
           </div>
         </div>
 
@@ -159,12 +109,13 @@ const ProfileHome = () => {
           <p>С помощью нее вы сможете увидеть свои охваты и статистику</p>
           
           <div className="social-accounts">
-            {connectedAccounts.map((account, index) => (
+            {connectedAccounts
+              .filter(account => account.platform !== 'Telegram')
+              .map((account, index) => (
               <div key={index} className="social-account">
                 <img 
                   src={
                     account.platform === 'Вконтакте' ? VK :
-                    account.platform === 'Telegram' ? Telegram :
                     account.platform === 'Рутуб' ? Rutube :
                     account.platform === 'Дзен' ? Dzen :
                     account.platform === 'YouTube' ? Youtube : VK
@@ -248,12 +199,7 @@ const ProfileHome = () => {
         </div>
       </div>
 
-      {/* Telegram Link Modal */}
-      <TelegramLinkModal
-        isOpen={showTelegramModal}
-        onClose={() => setShowTelegramModal(false)}
-        onSuccess={handleTelegramSuccess}
-      />
+
     </div>
   );
 };

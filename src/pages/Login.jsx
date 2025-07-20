@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStorage } from '../context/StorageContext';
 import { authStorage } from '../utils/localStorage';
+import LoadingScreen from '../components/LoadingScreen';
+import TelegramLinkModal from '../components/TelegramLinkModal';
 import Logo from '../img/Logo.png';
 import objectsAuth from '../img/objectsAuth.png';
 import manAuth from '../img/manAuth.png';
@@ -20,6 +22,10 @@ const Login = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showLoadingScreen, setShowLoadingScreen] = useState(false);
+  const [showTelegramModal, setShowTelegramModal] = useState(false);
+  const [telegramLinked, setTelegramLinked] = useState(false);
+  const [telegramData, setTelegramData] = useState(null);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -50,6 +56,21 @@ const Login = () => {
       password: '',
       rememberMe: false
     });
+    // Reset Telegram status when switching forms
+    setTelegramLinked(false);
+    setTelegramData(null);
+  };
+
+  const handleLoadingComplete = () => {
+    setShowLoadingScreen(false);
+    navigate('/profile');
+  };
+
+  const handleTelegramSuccess = (accountData) => {
+    console.log('Telegram account linked:', accountData);
+    setTelegramLinked(true);
+    setTelegramData(accountData);
+    setShowTelegramModal(false);
   };
 
   const handleLogin = async (e) => {
@@ -126,6 +147,8 @@ const Login = () => {
     }
   };
 
+
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -136,6 +159,8 @@ const Login = () => {
       if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
         throw new Error('Пожалуйста, заполните все поля');
       }
+
+
 
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -151,6 +176,11 @@ const Login = () => {
       // Validate name length
       if (formData.firstName.length < 2 || formData.lastName.length < 2) {
         throw new Error('Имя и фамилия должны содержать минимум 2 символа');
+      }
+
+      // Validate Telegram linking
+      if (!telegramLinked) {
+        throw new Error('Привязка Telegram аккаунта обязательна для регистрации');
       }
 
       // Simulate API delay
@@ -198,8 +228,12 @@ const Login = () => {
           password: '',
           rememberMe: false
         });
+        // Reset Telegram status
+        setTelegramLinked(false);
+        setTelegramData(null);
 
-        navigate('/profile');
+        // Show loading screen instead of immediate navigation
+        setShowLoadingScreen(true);
       } else {
         throw new Error('Ошибка регистрации');
       }
@@ -210,6 +244,11 @@ const Login = () => {
     }
   };
 
+  // Show loading screen if needed
+  if (showLoadingScreen) {
+    return <LoadingScreen onComplete={handleLoadingComplete} />;
+  }
+
   return (
     <div className="login2-page">
       {/* Background forms layer */}
@@ -219,6 +258,18 @@ const Login = () => {
           <img src={Logo} alt="OnMyFeed" className="login2-logo" />
           <h2 className="login2-title">Регистрация</h2>
           {error && <div className="login2-error" style={{ color: 'red', marginBottom: '10px', textAlign: 'center' }}>{error}</div>}
+          <div style={{ 
+            background: 'rgba(124, 42, 232, 0.1)', 
+            border: '1px solid rgba(124, 42, 232, 0.3)', 
+            borderRadius: '8px', 
+            padding: '10px', 
+            marginBottom: '15px', 
+            textAlign: 'center',
+            fontSize: '14px',
+            color: '#7c2ae8'
+          }}>
+            ⚠️ Привязка Telegram аккаунта обязательна для регистрации
+          </div>
           <form className="login2-form" onSubmit={handleRegister}>
             <div style={{ display: 'flex', gap: '10px' }}>
               <input 
@@ -256,10 +307,69 @@ const Login = () => {
               value={formData.password}
               onChange={handleInputChange}
             />
-            <button type="submit" className="login2-btn" disabled={loading}>
+
+            <button 
+              type="submit" 
+              className="login2-btn" 
+              disabled={loading || !telegramLinked}
+              style={{
+                opacity: !telegramLinked ? 0.6 : 1,
+                cursor: !telegramLinked ? 'not-allowed' : 'pointer'
+              }}
+            >
               {loading ? 'Регистрация...' : 'Зарегистрироваться'}
             </button>
+
+            {/* Telegram Link Button */}
+            <div style={{ marginTop: '15px', textAlign: 'center' }}>
+              {telegramLinked ? (
+                <div style={{
+                  background: 'linear-gradient(135deg, #28a745, #20c997)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '12px 20px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  width: '100%'
+                }}>
+                  <span style={{ fontSize: '16px' }}>✅</span>
+                  Telegram привязан: {telegramData?.username || 'Аккаунт'}
+                </div>
+              ) : (
+                <button 
+                  type="button" 
+                  className="telegram-link-btn"
+                  onClick={() => setShowTelegramModal(true)}
+                  style={{
+                    background: 'linear-gradient(135deg, #0088cc, #00a8ff)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '12px 20px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    width: '100%',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  <span style={{ fontSize: '16px' }}>✈️</span>
+                  Привязать Telegram аккаунт (обязательно)
+                </button>
+              )}
+            </div>
           </form>
+          
+          
           <div className="login2-register" style={{ textAlign: 'center', marginTop: '10px' }}>
             Есть аккаунт?{' '}
             <button type="button" className="login2-link" style={{ background: 'none', border: 'none', color: '#7c2ae8', cursor: 'pointer', padding: 0 }} onClick={() => handleFormSwitch(false)}>
@@ -322,6 +432,14 @@ const Login = () => {
           <img src={objectsAuth} alt="objects" className="auth-img login2-objects" />
         </div>
       </div>
+
+      {/* Telegram Link Modal */}
+      <TelegramLinkModal
+        isOpen={showTelegramModal}
+        onClose={() => setShowTelegramModal(false)}
+        onSuccess={handleTelegramSuccess}
+      />
+
     </div>
   );
 };

@@ -35,6 +35,22 @@ const TelegramLinkModal = ({ isOpen, onClose, onSuccess }) => {
         return;
       }
 
+      // Validate Telegram username
+      const cleanUsername = telegramUsername.trim();
+      if (!cleanUsername) {
+        setError('Please enter your Telegram username');
+        setLoading(false);
+        return;
+      }
+
+      // Remove @ if present and validate format
+      const username = cleanUsername.replace(/^@/, '');
+      if (username.length < 3 || username.length > 32) {
+        setError('Telegram username must be between 3 and 32 characters');
+        setLoading(false);
+        return;
+      }
+
       // Generate a 6-digit verification code
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       
@@ -43,7 +59,7 @@ const TelegramLinkModal = ({ isOpen, onClose, onSuccess }) => {
         cleanPhone, 
         code,
         null, // userId
-        telegramUsername.trim() || null // telegramUsername
+        username // telegramUsername (cleaned)
       );
 
       if (result.success) {
@@ -118,11 +134,12 @@ const TelegramLinkModal = ({ isOpen, onClose, onSuccess }) => {
       // Generate a new 6-digit verification code
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       
+      const username = telegramUsername.trim().replace(/^@/, '');
       const result = await telegramBot.sendVerificationCode(
         cleanPhone, 
         code,
         null, // userId
-        telegramUsername.trim() || null // telegramUsername
+        username // telegramUsername (cleaned)
       );
 
       if (result.success) {
@@ -199,15 +216,16 @@ const TelegramLinkModal = ({ isOpen, onClose, onSuccess }) => {
               </div>
 
               <div className="form-group">
-                <label>Telegram Username (Optional)</label>
+                <label>Telegram Username (Required)</label>
                 <input
                   type="text"
                   value={telegramUsername}
                   onChange={(e) => setTelegramUsername(e.target.value)}
                   placeholder="username (without @)"
                   className="username-input"
+                  required
                 />
-                <small>If provided, code will be sent to your Telegram. Otherwise, code will be displayed here.</small>
+                <small>Enter your Telegram username to receive the verification code. Make sure you have started a chat with @{TELEGRAM_CONFIG.BOT_USERNAME} first.</small>
               </div>
 
               {error && <div className="error-message">{error}</div>}
@@ -278,7 +296,13 @@ const TelegramLinkModal = ({ isOpen, onClose, onSuccess }) => {
 
         <div className="telegram-modal-footer">
           <div className="bot-info">
-            <p>💡 Make sure you have our bot @{TELEGRAM_CONFIG.BOT_USERNAME} in your Telegram contacts</p>
+            <p>💡 <strong>Important:</strong> Before linking, please:</p>
+            <ol style={{ margin: '10px 0', paddingLeft: '20px' }}>
+              <li>Open Telegram</li>
+              <li>Search for @{TELEGRAM_CONFIG.BOT_USERNAME}</li>
+              <li>Send /start to the bot</li>
+              <li>Then try linking again</li>
+            </ol>
             <p>🔒 Your data is secure and will only be used for account linking</p>
             <p>📱 Verification codes are sent to your Telegram account</p>
             {error && error.includes('Error sending to @') && (

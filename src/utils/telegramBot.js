@@ -237,9 +237,9 @@ class TelegramBotService {
       
       // Try to send via Telegram username if provided (even if bot not fully configured)
       if (telegramUsername) {
-        console.log(`📱 Attempting to send to Telegram username: @${telegramUsername}`);
-        
-
+        // Clean username - remove @ if present
+        const cleanUsername = telegramUsername.replace(/^@/, '');
+        console.log(`📱 Attempting to send to Telegram username: @${cleanUsername}`);
         
         try {
           const response = await fetch(`${this.apiBase}${this.botToken}/sendMessage`, {
@@ -248,7 +248,7 @@ class TelegramBotService {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              chat_id: `@${telegramUsername}`,
+              chat_id: `@${cleanUsername}`,
               text: message,
               parse_mode: 'HTML'
             })
@@ -263,24 +263,28 @@ class TelegramBotService {
             console.log('❌ Failed to send via username:', result.description);
             
             // Provide more specific error messages
-            let errorMessage = `Error sending to @${telegramUsername}`;
+            let errorMessage = `Error sending to @${cleanUsername}`;
             if (result.error_code === 400) {
-              errorMessage = `Username @${telegramUsername} not found or bot blocked`;
+              if (result.description.includes('chat not found')) {
+                errorMessage = `Please start a chat with @${this.botUsername} first by sending /start`;
+              } else if (result.description.includes('user not found')) {
+                errorMessage = `Username @${cleanUsername} not found. Please check the username and try again.`;
+              } else {
+                errorMessage = `Username @${cleanUsername} not found or bot blocked`;
+              }
             } else if (result.error_code === 403) {
-              errorMessage = `Bot blocked by @${telegramUsername}`;
+              errorMessage = `Bot blocked by @${cleanUsername}. Please unblock the bot and try again.`;
             } else if (result.error_code === 429) {
               errorMessage = `Rate limit exceeded. Please try again later.`;
-            } else if (result.error_code === 400 && result.description.includes('chat not found')) {
-              errorMessage = `Please start a chat with @${this.botUsername} first by sending /start`;
             }
             
             // Try to find stored chat ID for this username
             const chatIds = this.getStoredChatIds();
             const storedChat = Object.entries(chatIds).find(([id, info]) => 
+              info.username === cleanUsername || 
+              info.username === `@${cleanUsername}` ||
               info.username === telegramUsername || 
-              info.username === `@${telegramUsername}` ||
-              info.username === `puffer_fishh` ||
-              info.username === `@puffer_fishh`
+              info.username === `@${telegramUsername}`
             );
             
             if (storedChat) {
@@ -313,7 +317,7 @@ class TelegramBotService {
             // Return the code in the response instead of showing alert
             return { 
               success: true, 
-              message: `Could not send to @${telegramUsername}. Please use this code: ${code}`,
+              message: `Could not send to @${cleanUsername}. Please use this code: ${code}`,
               code: code,
               error: errorMessage
             };
@@ -323,9 +327,9 @@ class TelegramBotService {
           // Return the code in the response instead of showing alert
           return { 
             success: true, 
-            message: `Error sending to @${telegramUsername}. Please use this code: ${code}`,
+            message: `Error sending to @${cleanUsername}. Please use this code: ${code}`,
             code: code,
-            error: `Error sending to @${telegramUsername}`
+            error: `Error sending to @${cleanUsername}`
           };
         }
       }
