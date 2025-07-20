@@ -21,14 +21,11 @@ const ProfileHome = () => {
     addActivity 
   } = useStorage();
 
-  const [csvStats, setCsvStats] = useState(null);
   const [topUsers, setTopUsers] = useState([]);
 
   useEffect(() => {
     // Load CSV data
-    const stats = csvDB.getStatisticsSummary();
     const top = csvDB.getTopUsers(5);
-    setCsvStats(stats);
     setTopUsers(top);
   }, []);
 

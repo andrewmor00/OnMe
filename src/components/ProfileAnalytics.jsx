@@ -5,7 +5,6 @@ import '../App.css';
 
 const ProfileAnalytics = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('month');
-  const [analyticsData, setAnalyticsData] = useState(null);
   const [summaryData, setSummaryData] = useState([]);
   const [platformData, setPlatformData] = useState([]);
   const [topPosts, setTopPosts] = useState([]);
@@ -114,7 +113,6 @@ const ProfileAnalytics = () => {
         // Fallback to mock data
         const data = analyticsStorage.getAnalyticsForPeriod(selectedPeriod);
         if (data) {
-          setAnalyticsData(data);
           
           // Use CSV data for fallback with the same metrics
           const csvStats = csvDB.getStatisticsSummary();
@@ -254,7 +252,6 @@ const ProfileAnalytics = () => {
 
   // Calculate platform effectiveness from real data
   const calculatePlatformEffectiveness = () => {
-    const usersWithStats = csvDB.getUsersWithStats();
     const stats = csvDB.getAll('stats');
     
     // Calculate average engagement rates for different time periods

@@ -37,7 +37,7 @@ const LoadingScreen = ({ onComplete }) => {
     }, interval);
 
     return () => clearInterval(timer);
-  }, [onComplete]);
+  }, [onComplete, steps.length]);
 
   return (
     <div className="loading-screen">
