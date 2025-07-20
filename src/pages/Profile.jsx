@@ -17,7 +17,6 @@ import ProfilePost from '../img/ProfilePost.png';
 import ProfileTrend from '../img/ProfileTrend.png';
 import ProfileTariffs from '../img/ProfileTariffs.png';
 import ProfileSetting from '../img/ProfileSettings.png';
-import CSVIcon from '../img/CSVIcon.svg';
 
 import '../App.css';
 
