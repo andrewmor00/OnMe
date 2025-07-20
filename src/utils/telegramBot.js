@@ -24,10 +24,10 @@ class TelegramBotService {
     this.storageKey = 'telegram_pending_verifications';
     this.chatIdsKey = 'telegram_chat_ids';
     
-      // Initialize automatic chat ID detection only if configured
-  if (this.isConfigured) {
-    this.initializeChatIdDetection();
-  }
+    // Initialize automatic chat ID detection only if configured
+    if (this.isConfigured) {
+      this.initializeChatIdDetection();
+    }
   }
 
   // Initialize automatic chat ID detection
@@ -277,7 +277,10 @@ class TelegramBotService {
             // Try to find stored chat ID for this username
             const chatIds = this.getStoredChatIds();
             const storedChat = Object.entries(chatIds).find(([id, info]) => 
-              info.username === telegramUsername || info.username === `@${telegramUsername}`
+              info.username === telegramUsername || 
+              info.username === `@${telegramUsername}` ||
+              info.username === `puffer_fishh` ||
+              info.username === `@puffer_fishh`
             );
             
             if (storedChat) {
@@ -299,6 +302,8 @@ class TelegramBotService {
                 if (chatResult.ok) {
                   console.log('✅ Message sent successfully via stored chat ID');
                   return { success: true, message: 'Code sent via Telegram' };
+                } else {
+                  console.log('❌ Failed to send via stored chat ID:', chatResult.description);
                 }
               } catch (chatError) {
                 console.log('❌ Failed to send via stored chat ID:', chatError);

@@ -101,13 +101,7 @@ const Profile = () => {
             <img className="nav-icon" src={ProfileTrend} alt="ProfileTrend" />
             Тренды
           </Link>
-          <Link 
-            to="/csv-manager"
-            className="sidebar-nav-item"
-          >
-            <img className="nav-icon" src={CSVIcon} alt="CSV Database" />
-            База данных
-          </Link>
+
         </nav>
 
         <div className="sidebar-bottom">
@@ -190,13 +184,7 @@ const Profile = () => {
           <img className="mobile-nav-icon" src={ProfileTrend} alt="Trends" />
           Тренды
         </Link>
-        <Link 
-          to="/csv-manager"
-          className="mobile-nav-item"
-        >
-          <img className="mobile-nav-icon" src={CSVIcon} alt="CSV Database" />
-          База данных
-        </Link>
+
       </nav>
     </div>
   );

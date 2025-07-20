@@ -103,9 +103,7 @@ const ProfileHome = () => {
                     <span className="stat-label">Постов</span>
                   </div>
                 </div>
-                <p style={{ fontSize: '14px', color: '#666', marginTop: '10px' }}>
-                  Данные загружены из CSV файлов
-                </p>
+
               </div>
             ) : getConnectedCount() > 0 ? (
               <div>
@@ -128,9 +126,7 @@ const ProfileHome = () => {
             ) : (
               <p>Здесь будут приведены показатели постов, которое вы загрузите последним, и аккаунта в целом.</p>
             )}
-            <button className="add-account-btn" onClick={() => window.location.href = '/csv-manager'}>
-              {csvStats && csvStats.totalUsers > 0 ? 'Управление данными' : 'Добавить аккаунт'}
-            </button>
+
             <button 
               className="add-account-btn" 
               style={{ marginLeft: '10px', backgroundColor: '#0088cc' }}

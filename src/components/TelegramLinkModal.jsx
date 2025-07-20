@@ -55,7 +55,7 @@ const TelegramLinkModal = ({ isOpen, onClose, onSuccess }) => {
           setError(result.error);
           setSuccess('Verification code generated! Please use the code below.');
         } else {
-          setSuccess('Verification code sent to your Telegram!');
+        setSuccess('Verification code sent to your Telegram!');
         }
         
         // Set the generated code if provided in response
@@ -64,8 +64,8 @@ const TelegramLinkModal = ({ isOpen, onClose, onSuccess }) => {
         } else {
           // Extract the code from the message for backward compatibility
           const codeMatch = result.message.match(/code: (\d{6})/i);
-          if (codeMatch) {
-            setGeneratedCode(codeMatch[1]);
+        if (codeMatch) {
+          setGeneratedCode(codeMatch[1]);
           }
         }
       } else {
@@ -133,7 +133,7 @@ const TelegramLinkModal = ({ isOpen, onClose, onSuccess }) => {
           setError(result.error);
           setSuccess('New verification code generated! Please use the code below.');
         } else {
-          setSuccess('New verification code sent to your Telegram!');
+        setSuccess('New verification code sent to your Telegram!');
         }
         
         // Set the generated code if provided in response

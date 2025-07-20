@@ -70,7 +70,7 @@ const Navbar = () => {
         <div className="hero-auth-buttons">
           <span className="hero-user-name">Привет, {user?.firstName || 'Пользователь'}!</span>
           <Link to="/profile" className="hero-profile-btn">Профиль</Link>
-          <Link to="/csv-manager" className="hero-profile-btn" style={{ marginLeft: '10px', background: '#28a745' }}>База данных</Link>
+          
           <button onClick={handleLogout} className="hero-logout-btn">Выйти</button>
         </div>
       ) : (

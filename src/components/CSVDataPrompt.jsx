@@ -18,7 +18,7 @@ const CSVDataPrompt = ({ title, description, showImportButton = true }) => {
         {showImportButton && (
           <button 
             className="import-data-button"
-            onClick={() => window.location.href = '/csv-manager'}
+
           >
             Импортировать данные
           </button>
