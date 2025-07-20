@@ -12,6 +12,62 @@ class CSVDatabase {
     };
     
     this.metadata = this.getMetadata();
+    
+    // Auto-initialize with built-in data if no data exists
+    this.initializeWithBuiltInData();
+  }
+
+  // Initialize database with built-in CSV data
+  async initializeWithBuiltInData() {
+    const metadata = this.getMetadata();
+    const hasData = Object.values(metadata).some(type => type.count > 0);
+    
+    if (!hasData) {
+      console.log('Initializing CSV database with built-in data...');
+      await this.loadBuiltInData();
+    }
+  }
+
+  // Load built-in CSV data from the data directory
+  async loadBuiltInData() {
+    try {
+      // Import all built-in CSV files
+      const importPromises = [
+        this.importBuiltInCSV('users', '/data/users_df.csv'),
+        this.importBuiltInCSV('stats', '/data/stats_df.csv'),
+        this.importBuiltInCSV('comments', '/data/comments.csv'),
+        this.importBuiltInCSV('posts', '/data/posts_df.csv')
+      ];
+
+      await Promise.all(importPromises);
+      console.log('Successfully loaded all built-in CSV data');
+    } catch (error) {
+      console.error('Error loading built-in CSV data:', error);
+    }
+  }
+
+  // Import built-in CSV file
+  async importBuiltInCSV(type, filePath) {
+    try {
+      const response = await fetch(filePath);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch ${filePath}: ${response.statusText}`);
+      }
+      
+      const csvText = await response.text();
+      const result = await this.importCSV(csvText, type);
+      
+      if (result.success) {
+        console.log(`Successfully imported built-in ${type} data: ${result.count} records`);
+      } else {
+        console.error(`Failed to import built-in ${type} data:`, result.error);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error(`Error importing built-in ${type} CSV:`, error);
+      return { success: false, error: error.message };
+    }
   }
 
   // Get metadata about imported data

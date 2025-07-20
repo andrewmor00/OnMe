@@ -93,13 +93,7 @@ const Profile = () => {
             <img className="nav-icon" src={ProfilePost} alt="ProfilePost" />
             Постинг
           </Link>
-          <Link 
-            to="/profile/trends"
-            className={`sidebar-nav-item ${isActive('/trends') ? 'active' : ''}`}
-          >
-            <img className="nav-icon" src={ProfileTrend} alt="ProfileTrend" />
-            Тренды
-          </Link>
+
 
         </nav>
 

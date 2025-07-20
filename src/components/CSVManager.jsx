@@ -15,6 +15,7 @@ const CSVManager = () => {
   const [itemsPerPage] = useState(20);
   const [loading, setLoading] = useState(false);
   const [importStatus, setImportStatus] = useState({});
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const loadData = useCallback(() => {
     const allData = csvDB.getAll(selectedType);
@@ -23,7 +24,27 @@ const CSVManager = () => {
   }, [selectedType]);
 
   useEffect(() => {
-    loadData();
+    // Check if data is initialized
+    const checkInitialization = async () => {
+      setLoading(true);
+      
+      // Wait a bit for the database to initialize
+      setTimeout(() => {
+        const currentMetadata = csvDB.getMetadata();
+        setMetadata(currentMetadata);
+        
+        const hasData = Object.values(currentMetadata).some(type => type.count > 0);
+        setIsInitialized(hasData);
+        
+        if (hasData) {
+          loadData();
+        }
+        
+        setLoading(false);
+      }, 1000);
+    };
+
+    checkInitialization();
   }, [loadData]);
 
 
@@ -230,8 +251,22 @@ const CSVManager = () => {
         </div>
       </div>
 
+      {isInitialized && (
+        <div className="data-status">
+          <div className="status-message success">
+            ✅ CSV data is already loaded and ready to use!
+          </div>
+          <div className="status-description">
+            The database has been automatically initialized with built-in CSV files from the data directory.
+          </div>
+        </div>
+      )}
+
       <div className="import-section">
-        <h3>Import CSV Files</h3>
+        <h3>Import Additional CSV Files (Optional)</h3>
+        <div className="import-description">
+          You can import additional CSV files to supplement the existing data or replace it entirely.
+        </div>
         <div className="import-grid">
           {['users', 'stats', 'comments', 'posts'].map(type => (
             <div key={type} className="import-item">
@@ -294,8 +329,13 @@ const CSVManager = () => {
           </div>
         </div>
 
-        {loading && <div className="loading">Loading...</div>}
-        {renderDataTable()}
+        {loading && (
+          <div className="loading">
+            <div className="loading-spinner"></div>
+            <div>Initializing CSV database with built-in data...</div>
+          </div>
+        )}
+        {!loading && renderDataTable()}
       </div>
     </div>
   );

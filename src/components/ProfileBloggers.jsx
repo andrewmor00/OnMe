@@ -20,7 +20,6 @@ const ProfileBloggers = () => {
   });
   const [sortBy, setSortBy] = useState('subscribers');
   const [sortOrder, setSortOrder] = useState('desc');
-  const [showFilters, setShowFilters] = useState(false);
   const cardsPerPage = 6; // Show 6 cards per page (2 rows of 3)
 
   // Load real data from CSV database
@@ -369,58 +368,9 @@ const ProfileBloggers = () => {
             </button>
           </div>
         </div>
-      ) : (
-        <>
-          {/* Account Integration Prompt */}
-          <div className="account-integration-banner">
-            <div className="banner-content">
-              <div className="banner-left">
-                <div className="sparkle-icons">
-                  <img src={StarsProfile} alt="StarsProfile" className='sparkle-avatar'/>
-                </div>
-                <div className="banner-text">
-                  <h3>Данные загружены успешно!</h3>
-                  <p>Отображается {bloggers.length} блогеров из ваших CSV файлов</p>
-                </div>
-              </div>
-              <button className="add-account-button" onClick={() => window.location.href = '/csv-manager'}>
-                Управление данными
-              </button>
-              <button 
-                className="add-account-button" 
-                style={{ marginLeft: '10px', backgroundColor: '#28a745' }}
-                onClick={() => {
-                  // Create file input for CSV import
-                  const input = document.createElement('input');
-                  input.type = 'file';
-                  input.accept = '.csv';
-                  input.onchange = async (e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      try {
-                        const result = await csvDB.importFromFile(file, 'users');
-                        if (result.success) {
-                          alert(`Successfully imported ${result.count} users!`);
-                          window.location.reload(); // Reload to show new data
-                        } else {
-                          alert(`Import failed: ${result.error}`);
-                        }
-                      } catch (error) {
-                        alert(`Error: ${error.message}`);
-                      }
-                    }
-                  };
-                  input.click();
-                }}
-              >
-                Импорт CSV
-              </button>
-            </div>
-          </div>
-        </>
-      )}
+      ) : null}
 
-      {/* Search and Filter Section */}
+      {/* Search Section */}
       <div className="search-section">
         <div className="search-container">
           <input
@@ -431,19 +381,95 @@ const ProfileBloggers = () => {
             className="search-input"
           />
           <button className="search-btn">Поиск</button>
-          <button 
-            className={`filter-toggle-btn ${showFilters ? 'active' : ''}`}
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            🔍 Фильтры {showFilters ? '▼' : '▶'}
-          </button>
         </div>
       </div>
 
-      {/* Filters Panel */}
-      {showFilters && (
+      {/* Main Content with Carousel and Filters */}
+      <div className="main-content-layout">
+        {/* Bloggers Carousel */}
+        <div className="bloggers-carousel-section">
+          <div className="carousel-container">
+            <div className="carousel-header">
+              <h3 className="carousel-title">Блогеры</h3>
+              <div className="carousel-navigation">
+                <button 
+                  className="carousel-btn prev-btn" 
+                  onClick={prevPage}
+                  disabled={currentPage === 0}
+                >
+                  ‹
+                </button>
+                <span className="carousel-indicator">
+                  {currentPage + 1} / {totalPages}
+                </span>
+                <button 
+                  className="carousel-btn next-btn" 
+                  onClick={nextPage}
+                  disabled={currentPage === totalPages - 1}
+                >
+                  ›
+                </button>
+              </div>
+            </div>
+            
+            <div className="bloggers-carousel">
+              <div className="bloggers-grid">
+                {currentBloggers.map((blogger) => (
+                  <div key={blogger.id} className="blogger-card">
+                    <div className="blogger-header">
+                      <div className="blogger-avatar">
+                        <img src={ProfileIcon} alt="ProfileBlogs" className='ProfileBlogs'/>
+                      </div>
+                      <div className="blogger-info">
+                        <div className="blogger-name-row">
+                          <span className="blogger-name">{blogger.name}</span>
+                          {blogger.verified && <span className="verified-icon">✓</span>}
+                        </div>
+                        <div className="platform-info">
+                          <span className="platform-name">{blogger.platform}</span>
+                        </div>
+                      </div>
+                      <div className="platform-icon-container">
+                        <span className="platform-icon">{getPlatformIcon(blogger.platformIcon)}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="blogger-statistics">
+                      <div className="stat-item">
+                        <div className="stat-value">{blogger.subscribers}</div>
+                        <div className="stat-label">Подписчики</div>
+                      </div>
+                      <div className="stat-item">
+                        <div className="stat-value">{blogger.engagement}</div>
+                        <div className="stat-label">Вовлечение</div>
+                      </div>
+                      <div className="stat-item">
+                        <div className="stat-value">{blogger.reach}</div>
+                        <div className="stat-label">Охват</div>
+                      </div>
+                    </div>
+                    
+                    <div className="blogger-tags">
+                      {blogger.tags.map((tag, index) => (
+                        <span 
+                          key={index} 
+                          className={`tag ${tag === 'Коллаборация' ? 'tag-collaboration' : 'tag-category'}`}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Filters Panel */}
         <div className="filters-panel">
-          <div className="filters-grid">
+          <h3 className="filters-title">Фильтры</h3>
+          <div className="filters-content">
             {/* Platform Filter */}
             <div className="filter-group">
               <label>Платформа:</label>
@@ -532,127 +558,36 @@ const ProfileBloggers = () => {
                 ))}
               </div>
             </div>
-          </div>
 
-          {/* Sort Options */}
-          <div className="sort-section">
-            <label>Сортировка:</label>
-            <select 
-              value={sortBy} 
-              onChange={(e) => setSortBy(e.target.value)}
-            >
-              <option value="subscribers">По подписчикам</option>
-              <option value="engagement">По вовлечению</option>
-              <option value="name">По имени</option>
-              <option value="platform">По платформе</option>
-            </select>
-            <button 
-              className={`sort-order-btn ${sortOrder === 'desc' ? 'desc' : 'asc'}`}
-              onClick={() => setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')}
-            >
-              {sortOrder === 'desc' ? '↓' : '↑'}
-            </button>
-          </div>
-
-          {/* Filter Actions */}
-          <div className="filter-actions">
-            <button className="clear-filters-btn" onClick={clearFilters}>
-              Очистить фильтры
-            </button>
-            <span className="results-count">
-              Найдено: {filteredBloggers.length} из {bloggers.length}
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* Main Content with Carousel and Filters */}
-      <div className="main-content-layout">
-        {/* Bloggers Carousel */}
-        <div className="bloggers-carousel-section">
-          <div className="carousel-container">
-            <div className="carousel-header">
-              <h3 className="carousel-title">Блогеры</h3>
-              <div className="carousel-navigation">
-                <button 
-                  className="carousel-btn prev-btn" 
-                  onClick={prevPage}
-                  disabled={currentPage === 0}
-                >
-                  ‹
-                </button>
-                <span className="carousel-indicator">
-                  {currentPage + 1} / {totalPages}
-                </span>
-                <button 
-                  className="carousel-btn next-btn" 
-                  onClick={nextPage}
-                  disabled={currentPage === totalPages - 1}
-                >
-                  ›
-                </button>
-              </div>
+            {/* Sort Options */}
+            <div className="sort-section">
+              <label>Сортировка:</label>
+              <select 
+                value={sortBy} 
+                onChange={(e) => setSortBy(e.target.value)}
+              >
+                <option value="subscribers">По подписчикам</option>
+                <option value="engagement">По вовлечению</option>
+                <option value="name">По имени</option>
+                <option value="platform">По платформе</option>
+              </select>
+              <button 
+                className={`sort-order-btn ${sortOrder === 'desc' ? 'desc' : 'asc'}`}
+                onClick={() => setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')}
+              >
+                {sortOrder === 'desc' ? '↓' : '↑'}
+              </button>
             </div>
-            
-            <div className="bloggers-carousel">
-              <div className="bloggers-grid">
-                {currentBloggers.map((blogger) => (
-                  <div key={blogger.id} className="blogger-card">
-                    <div className="blogger-header">
-                      <div className="blogger-avatar">
-                        <img src={ProfileIcon} alt="ProfileBlogs" className='ProfileBlogs'/>
-                      </div>
-                      <div className="blogger-info">
-                        <div className="blogger-name-row">
-                          <span className="blogger-name">{blogger.name}</span>
-                          {blogger.verified && <span className="verified-icon">✓</span>}
-                        </div>
-                        <div className="platform-info">
-                          <span className="platform-name">{blogger.platform}</span>
-                        </div>
-                      </div>
-                      <div className="platform-icon-container">
-                        <span className="platform-icon">{getPlatformIcon(blogger.platformIcon)}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="blogger-statistics">
-                      <div className="stat-item">
-                        <div className="stat-value">{blogger.subscribers}</div>
-                        <div className="stat-label">Подписчики</div>
-                      </div>
-                      <div className="stat-item">
-                        <div className="stat-value">{blogger.engagement}</div>
-                        <div className="stat-label">Вовлечение</div>
-                      </div>
-                      <div className="stat-item">
-                        <div className="stat-value">{blogger.reach}</div>
-                        <div className="stat-label">Охват</div>
-                      </div>
-                    </div>
-                    
-                    <div className="blogger-tags">
-                      {blogger.tags.map((tag, index) => (
-                        <span 
-                          key={index} 
-                          className={`tag ${tag === 'Коллаборация' ? 'tag-collaboration' : 'tag-category'}`}
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Filters Panel */}
-        <div className="filters-panel">
-          <h3 className="filters-title">Фильтры</h3>
-          <div className="filters-content">
-            {/* Filter options would go here */}
+            {/* Filter Actions */}
+            <div className="filter-actions">
+              <button className="clear-filters-btn" onClick={clearFilters}>
+                Очистить фильтры
+              </button>
+              <span className="results-count">
+                Найдено: {filteredBloggers.length} из {bloggers.length}
+              </span>
+            </div>
           </div>
         </div>
       </div>
