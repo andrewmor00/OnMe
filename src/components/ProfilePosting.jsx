@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import '../App.css';
 import './ProfilePosting.css';
 
 const ProfilePosting = () => {
-  const [selectedTab, setSelectedTab] = useState('scheduled');
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
-  const [calendarView, setCalendarView] = useState('month'); // month, week, day
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
